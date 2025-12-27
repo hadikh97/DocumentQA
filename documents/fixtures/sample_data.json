@@ -1,0 +1,85 @@
+[
+  {
+    "model": "documents.tag",
+    "pk": 1,
+    "fields": {
+      "name": "Technology",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "documents.tag",
+    "pk": 2,
+    "fields": {
+      "name": "Science",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "documents.tag",
+    "pk": 3,
+    "fields": {
+      "name": "Business",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "documents.document",
+    "pk": 1,
+    "fields": {
+      "title": "Introduction to Machine Learning",
+      "content": "Machine learning is a subset of artificial intelligence (AI) that provides systems the ability to automatically learn and improve from experience without being explicitly programmed. Machine learning focuses on the development of computer programs that can access data and use it to learn for themselves.\n\nThe process of learning begins with observations or data, such as examples, direct experience, or instruction, in order to look for patterns in data and make better decisions in the future based on the examples that we provide. The primary aim is to allow the computers to learn automatically without human intervention or assistance and adjust actions accordingly.\n\nTypes of Machine Learning:\n1. Supervised Learning: The algorithm learns from labeled training data and makes predictions.\n2. Unsupervised Learning: The algorithm finds patterns in unlabeled data.\n3. Reinforcement Learning: The algorithm learns through trial and error using feedback from actions.",
+      "content_reference": "db",
+      "date": "2024-01-15",
+      "created_at": "2024-01-15T10:00:00Z",
+      "updated_at": "2024-01-15T10:00:00Z",
+      "tags": [1, 2]
+    }
+  },
+  {
+    "model": "documents.document",
+    "pk": 2,
+    "fields": {
+      "title": "Cloud Computing Fundamentals",
+      "content": "Cloud computing is the on-demand availability of computer system resources, especially data storage and computing power, without direct active management by the user. Large clouds often have functions distributed over multiple locations, each of which is a data center.\n\nCloud computing relies on sharing of resources to achieve coherence and typically uses a pay-as-you-go model, which can help in reducing capital expenses but may also lead to unexpected operating expenses for users.\n\nMain Service Models:\n1. Infrastructure as a Service (IaaS): Provides virtualized computing resources over the internet.\n2. Platform as a Service (PaaS): Provides a platform allowing customers to develop, run, and manage applications.\n3. Software as a Service (SaaS): Delivers software applications over the internet on a subscription basis.\n\nMajor cloud providers include Amazon Web Services (AWS), Microsoft Azure, and Google Cloud Platform (GCP).",
+      "content_reference": "db",
+      "date": "2024-01-20",
+      "created_at": "2024-01-20T10:00:00Z",
+      "updated_at": "2024-01-20T10:00:00Z",
+      "tags": [1, 3]
+    }
+  },
+  {
+    "model": "documents.document",
+    "pk": 3,
+    "fields": {
+      "title": "Data Science and Analytics",
+      "content": "Data science is an interdisciplinary field that uses scientific methods, processes, algorithms and systems to extract knowledge and insights from structured and unstructured data. Data science is related to data mining, machine learning and big data.\n\nData science is a concept to unify statistics, data analysis, informatics, and their related methods in order to understand and analyze actual phenomena with data. It uses techniques and theories drawn from many fields within the context of mathematics, statistics, computer science, information science, and domain knowledge.\n\nKey Components of Data Science:\n1. Data Collection: Gathering data from various sources.\n2. Data Cleaning: Preparing and cleaning data for analysis.\n3. Exploratory Data Analysis: Understanding patterns and relationships in data.\n4. Machine Learning: Building predictive models.\n5. Data Visualization: Presenting insights through charts and graphs.\n\nPopular tools include Python, R, SQL, Tableau, and various machine learning frameworks like TensorFlow and scikit-learn.",
+      "content_reference": "db",
+      "date": "2024-02-01",
+      "created_at": "2024-02-01T10:00:00Z",
+      "updated_at": "2024-02-01T10:00:00Z",
+      "tags": [1, 2]
+    }
+  },
+  {
+    "model": "documents.question",
+    "pk": 1,
+    "fields": {
+      "text": "What are the main types of machine learning?",
+      "answer": null,
+      "created_at": "2024-02-10T10:00:00Z",
+      "answered_at": null
+    }
+  },
+  {
+    "model": "documents.question",
+    "pk": 2,
+    "fields": {
+      "text": "What are the three main cloud service models?",
+      "answer": null,
+      "created_at": "2024-02-10T11:00:00Z",
+      "answered_at": null
+    }
+  }
+]
