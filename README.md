@@ -1,237 +1,245 @@
-# Document Question-Answering System
+# DocumentQA
 
-A Django backend system that manages textual documents, retrieves relevant content for user questions, and generates answers using LangChain with free LLMs.
+A simple **Document Question Answering (QA)** backend built with **Django**, **TF-IDF retrieval**, and **LangChain + HuggingFace LLM**.
 
-## Features
+This project is intentionally designed for a **Junior Backend Developer interview task**: the focus is on clean architecture, understandable data flow, and explainable technical decisions — not over-engineering.
 
-- **Document Management**: Create, edit, delete, search, and filter documents via Django admin
-- **Tag System**: Organize documents with multiple tags
-- **TF-IDF Retrieval**: Find relevant documents using text similarity
-- **LLM Integration**: Generate answers using HuggingFace models or FakeLLM for testing
-- **REST API**: Full API for documents, questions, and answer generation
-- **Docker Support**: Single-command deployment with PostgreSQL
+---
 
-## Architecture
+## ✨ Features
+
+- Upload and manage documents via Django Admin
+- Retrieve relevant documents using **TF-IDF + cosine similarity**
+- Generate answers using **LangChain** connected to a **HuggingFace LLM**
+- Clean separation of concerns (views / services / retrieval / LLM)
+- REST-style API endpoints
+- Docker & local development support
+
+---
+
+## 🧱 High-Level Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     Django Application                       │
-├─────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
-│  │   Admin     │  │  REST API   │  │      Models         │  │
-│  │   Panel     │  │  Endpoints  │  │ Document/Tag/Question│ │
-│  └──────┬──────┘  └──────┬──────┘  └──────────┬──────────┘  │
-│         │                │                     │             │
-│  ┌──────▼─────────────────▼─────────────────────▼──────────┐ │
-│  │                    Services Layer                        │ │
-│  │  ┌─────────────────┐    ┌─────────────────────────────┐ │ │
-│  │  │ DocumentRetriever│    │      QAChainService         │ │ │
-│  │  │   (TF-IDF)      │    │  (LangChain + HuggingFace)  │ │ │
-│  │  └─────────────────┘    └─────────────────────────────┘ │ │
-│  └─────────────────────────────────────────────────────────┘ │
-│                              │                               │
-│  ┌───────────────────────────▼───────────────────────────┐   │
-│  │              Storage Abstraction Layer                 │   │
-│  │         (DatabaseStorageBackend / Future: S3)         │   │
-│  └───────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                    ┌─────────▼─────────┐
-                    │    PostgreSQL     │
-                    └───────────────────┘
+User Question
+    ↓
+API View (documents/views.py)
+    ↓
+Retrieval Service (documents/services/retriever.py)
+    ↓
+TF-IDF Similarity Search
+    ↓
+Context Builder
+    ↓
+QA Chain (documents/services/qa_chain.py)
+    ↓
+HuggingFace LLM (via LangChain)
+    ↓
+Answer Returned to User
 ```
 
-## Quick Start
+---
 
-### Using Docker (Recommended)
+## 📁 Project Structure
+
+```
+DocumentQA/
+│
+├── docqa_project/        # Django settings & URLs
+├── documents/            # Main application
+│   ├── models.py         # Document model
+│   ├── views.py          # API views
+│   ├── services/
+│   │   ├── retriever.py  # TF-IDF retrieval logic
+│   │   └── qa_chain.py   # LangChain + LLM integration
+│
+├── manage.py
+├── requirements.txt
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
+## 🚀 Running the Project (Local)
+
+### 1️⃣ Prerequisites
+
+- Python **3.10+**
+- pip
+- virtualenv (recommended)
+
+---
+
+### 2️⃣ Clone the Repository
 
 ```bash
-# Clone the repository
-git clone https://github.com/lebleuciel/chatservice.git
-cd chatservice
-
-# Start the application
-docker-compose up --build
-
-# In another terminal, load sample data
-docker-compose exec web python manage.py load_samples
+git clone https://github.com/hadikh97/DocumentQA.git
+cd DocumentQA
 ```
 
-Access the application:
-- **Admin Panel**: http://localhost:8000/admin (login: `admin`/`admin`)
-- **API**: http://localhost:8000/api/
+---
 
-### Local Development
+### 3️⃣ Create & Activate Virtual Environment
+
+**Windows (PowerShell):**
+```bash
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+**Linux / macOS:**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+---
+
+### 4️⃣ Install Dependencies
 
 ```bash
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Set environment variables
-export POSTGRES_HOST=localhost
-export USE_FAKE_LLM=True
-
-# Run migrations
-python manage.py migrate
-
-# Create superuser
-python manage.py createsuperuser
-
-# Load sample data
-python manage.py load_samples
-
-# Run server
-python manage.py runserver
 ```
 
-## API Endpoints
+---
 
-### Documents
+### 5️⃣ Environment Variables
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/documents/` | List all documents |
-| GET | `/api/documents/{id}/` | Get document details |
+Create a `.env` file in the project root:
 
-### Questions
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/questions/` | List all questions |
-| POST | `/api/questions/` | Create a new question |
-| GET | `/api/questions/{id}/` | Get question details |
-
-### Retrieval & QA
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/retrieve/` | Find relevant documents |
-| POST | `/api/ask/` | Ask question and get answer |
-| POST | `/api/refresh-index/` | Refresh TF-IDF index |
-
-### Example: Ask a Question
-
-```bash
-curl -X POST http://localhost:8000/api/ask/ \
-  -H "Content-Type: application/json" \
-  -d '{"question": "What are the types of machine learning?"}'
-```
-
-Response:
-```json
-{
-  "question_id": 1,
-  "question": "What are the types of machine learning?",
-  "answer": "Based on the provided documents...",
-  "related_documents": [
-    {"id": 1, "title": "Introduction to Machine Learning", "date": "2024-01-15"}
-  ],
-  "answered_at": "2024-02-10T12:00:00Z"
-}
-```
-
-### Example: Retrieve Documents
-
-```bash
-curl -X POST http://localhost:8000/api/retrieve/ \
-  -H "Content-Type: application/json" \
-  -d '{"question": "cloud computing", "top_k": 3}'
-```
-
-## Configuration
-
-### Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DEBUG` | `True` | Django debug mode |
-| `SECRET_KEY` | (generated) | Django secret key |
-| `POSTGRES_DB` | `docqa` | Database name |
-| `POSTGRES_USER` | `docqa` | Database user |
-| `POSTGRES_PASSWORD` | `docqa` | Database password |
-| `POSTGRES_HOST` | `db` | Database host |
-| `USE_FAKE_LLM` | `True` | Use FakeLLM for testing |
-| `HUGGINGFACE_MODEL` | `google/flan-t5-base` | HuggingFace model |
-| `DOCUMENT_STORAGE_BACKEND` | `...DatabaseStorageBackend` | Storage backend |
-
-### LLM Configuration
-
-**FakeLLM (Testing)**:
-```bash
-USE_FAKE_LLM=True
-```
-
-**HuggingFace (Production)**:
-```bash
+```env
+DEBUG=True
+SECRET_KEY=django-secret-key
 USE_FAKE_LLM=False
 HUGGINGFACE_MODEL=google/flan-t5-base
 ```
 
-## Admin Panel Features
+> `USE_FAKE_LLM=True` can be used for testing without calling a real model.
 
-- **Documents**: Add, edit, delete with tag management
-- **Questions**: View questions, generate answers
-- **Admin Actions**:
-  - "Refresh search index" - Rebuild TF-IDF index
-  - "Find relevant documents" - Associate docs with questions
-  - "Generate answers" - Generate LLM answers for questions
+---
 
-## Project Structure
-
-```
-chatservice/
-├── docqa_project/          # Django project settings
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-├── documents/              # Main application
-│   ├── models.py           # Document, Tag, Question models
-│   ├── admin.py            # Admin configuration
-│   ├── views.py            # API views
-│   ├── serializers.py      # DRF serializers
-│   ├── urls.py             # URL routing
-│   ├── services/
-│   │   ├── retriever.py    # TF-IDF document retrieval
-│   │   └── qa_chain.py     # LangChain QA service
-│   ├── storage/
-│   │   ├── base.py         # Storage interface
-│   │   └── database.py     # Database storage backend
-│   ├── fixtures/
-│   │   └── sample_data.json
-│   └── management/
-│       └── commands/
-│           └── load_samples.py
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
-└── README.md
-```
-
-## Storage Backend
-
-The system uses a storage abstraction layer for document content:
-
-**Current**: `DatabaseStorageBackend` - Stores content in PostgreSQL TextField
-
-**Future**: `ObjectStorageBackend` - Store in MinIO/S3 (not implemented)
-
-To switch backends, change `DOCUMENT_STORAGE_BACKEND` in settings.
-
-## Testing
+### 6️⃣ Apply Migrations & Create Superuser
 
 ```bash
-# Run tests
-python manage.py test documents
-
-# With coverage
-coverage run manage.py test documents
-coverage report
+python manage.py migrate
+python manage.py createsuperuser
 ```
 
-## License
+---
+
+### 7️⃣ Run the Server
+
+```bash
+python manage.py runserver
+```
+
+- Admin panel: http://127.0.0.1:8000/admin/
+- API base: http://127.0.0.1:8000/api/
+
+---
+
+## 🧪 API Usage Examples
+
+### 🔹 Retrieve Relevant Documents
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/retrieve/ \
+     -H "Content-Type: application/json" \
+     -d '{"query": "What is Django?"}'
+```
+
+---
+
+### 🔹 Ask a Question (Full QA Flow)
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/ask/ \
+     -H "Content-Type: application/json" \
+     -d '{"question": "What is Django used for?"}'
+```
+
+**Response example:**
+```json
+{
+  "question": "What is Django used for?",
+  "answer": "Django is a high-level Python web framework used for building web applications.",
+  "documents_used": [
+    {"id": 1, "title": "Django Overview"}
+  ]
+}
+```
+
+---
+
+## 🤖 LLM Integration Details
+
+- LLM integration lives in:
+  ```
+  documents/services/qa_chain.py
+  ```
+
+- Uses **LangChain** to:
+  - Build prompt
+  - Inject retrieved document context
+  - Call HuggingFace model
+
+- Switching between fake and real LLM is controlled via:
+  ```env
+  USE_FAKE_LLM=True | False
+  ```
+
+---
+
+## 🧠 Why TF-IDF (Design Decision)
+
+For a junior-level backend task:
+
+- TF-IDF is:
+  - Simple
+  - Fast
+  - Easy to explain
+- Demonstrates understanding of **retrieval pipelines**
+
+> Embedding-based semantic search can be added later for production-scale systems.
+
+---
+
+## 🐳 Running with Docker (Optional)
+
+```bash
+docker-compose up --build
+```
+
+---
+
+## ⚠️ Notes for Interviewers
+
+- Project intentionally avoids over-engineering
+- Focus is on:
+  - Clean backend structure
+  - Retrieval + LLM integration
+  - Explainable decisions
+
+---
+
+## 📌 Future Improvements (Out of Scope)
+
+- Semantic search with embeddings
+- Caching (Redis)
+- Authentication
+- Automated tests
+- OpenAPI / Swagger docs
+
+---
+
+## 👤 Author
+
+**Hadi Khodadadi**  
+Backend Developer (Junior)
+
+---
+
+## 📄 License
 
 MIT License
+
